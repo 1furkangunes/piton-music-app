@@ -9,7 +9,7 @@
 
 *Enterprise-level müzik streaming uygulaması - Clean Architecture ile geliştirilmiş*
 
-[Özellikler](#-özellikler) • [Kurulum](#-kurulum) • [Mimari](#-mimari-yapısı) • [API](#-api-entegrasyonu) • [Katkıda Bulun](#-katkıda-bulunma)
+[Özellikler](#-özellikler) • [Kurulum](#-kurulum) • [Mimari](#-mimari-yapısı) • [API](#-api-entegrasyonu) • [Performance](#-performance-features) • [Test](#-test-coverage) • [Security](#-security--privacy) • [Deployment](#-production-deployment) • [Roadmap](#-roadmap) • [Katkıda Bulun](#-katkıda-bulunma) • [License](#-license)
 
 </div>
 
@@ -77,8 +77,8 @@ Git
 ### Hızlı Başlangıç
 ```bash
 # Repo'yu klonlayın
-git clone <repository-url>
-cd piton_technology_intern
+git clone https://github.com/1furkangunes/piton-music-app.git
+cd piton-music-app
 
 # Bağımlılıkları yükleyin
 flutter pub get
@@ -149,157 +149,6 @@ flutter run -d chrome
 └── 🛠️ utils/                        # Helper Functions
     └── responsive.dart              # Responsive Design
 ```
-
-### 🎯 Service Layer Pattern
-
-```dart
-// Singleton Pattern ile Global State Management
-class AudioPlayerService {
-  static final AudioPlayer _player = AudioPlayer();
-  static final StreamController<Music?> _controller = 
-      StreamController<Music?>.broadcast();
-  
-  // Global access to music state
-  static Stream<Music?> get currentMusicStream => _controller.stream;
-}
-```
-
-### 🔄 Reactive Programming
-
-```dart
-// StreamBuilder ile Real-time UI Updates
-StreamBuilder<bool>(
-  stream: AudioPlayerService.playingStream,
-  builder: (context, snapshot) {
-    // UI otomatik güncellenir
-    return isPlaying ? PauseIcon() : PlayIcon();
-  },
-)
-```
-
----
-
-## 🌐 API Entegrasyonu
-
-### Jamendo API Features
-
-```dart
-class JamendoService {
-  // ⚡ Parallel API Calls - 5x Performance Boost
-  Future<List<Music>> getAllGenresParallel() async {
-    final futures = genres.map((genre) => 
-        getTracksByGenre(genre, limit: 10));
-    return await Future.wait(futures); // 🚀 Concurrent execution
-  }
-  
-  // 🔍 Smart Search
-  Future<List<Music>> searchTracks(String query) async {
-    // Debounced search implementation
-  }
-}
-```
-
-### Performance Optimizations
-
-- **Parallel API Calls**: 5 genre çağrısı 2 saniyede tamamlanır
-- **Request Timeout**: 10 saniye timeout ile stability
-- **Auto-Retry**: Network hatalarında otomatik tekrar deneme
-- **Smart Caching**: Repeated requests için cache kullanımı
-
----
-
-## 🎨 Responsive Design System
-
-### Breakpoint Strategy
-
-```dart
-class ResponsiveHelper {
-  // 📱 Mobile First Approach
-  static bool isMobile(BuildContext context) => 
-      MediaQuery.of(context).size.width < 768;
-      
-  // 📊 Dynamic Grid System
-  static int getGridCrossAxisCount(BuildContext context) {
-    if (isDesktop(context)) return 4;   // 🖥️ Desktop: 4 columns
-    if (isTablet(context)) return 3;    // 📱 Tablet: 3 columns  
-    return 2;                           // 📱 Mobile: 2 columns
-  }
-}
-```
-
-### Design Tokens
-
-```dart
-// 🎨 Color System
-Primary: #6C5CE7    // Modern Purple
-Secondary: #00B4D8  // Vibrant Blue
-Success: #27AE60    // Green
-Error: #E74C3C      // Red
-Warning: #F39C12    // Orange
-
-// 📱 Typography Scale
-H1: 28px / Bold     // Page Headers
-H2: 24px / Bold     // Section Headers
-H3: 20px / SemiBold // Card Headers
-Body: 16px / Regular // Content
-Caption: 14px / Regular // Labels
-```
-
----
-
-## ⚡ Performance Features
-
-### Memory Management
-
-```dart
-class _MiniPlayerBarState extends State<MiniPlayerBar> {
-  StreamSubscription? _playingSubscription;
-  
-  @override
-  void dispose() {
-    _playingSubscription?.cancel(); // ✅ Prevent memory leaks
-    super.dispose();
-  }
-}
-```
-
-### Search Optimization
-
-```dart
-// 🔍 Debounced Search - API call reduction
-Timer? _searchTimer;
-
-_searchController.addListener(() {
-  _searchTimer?.cancel();
-  _searchTimer = Timer(Duration(milliseconds: 500), () {
-    _performSearch(); // Single API call after 500ms
-  });
-});
-```
-
-### File Management
-
-```dart
-// 📁 Hierarchical Storage Strategy
-Future<Directory> _getDownloadDirectory() async {
-  try {
-    // 1. External Storage (Best)
-    directory = await getExternalStorageDirectory();
-    if (directory != null) return directory;
-    
-    // 2. Documents Directory (Good)
-    directory = await getApplicationDocumentsDirectory();
-    return directory;
-    
-    // 3. Temporary Directory (Fallback)
-    return await getTemporaryDirectory();
-  } catch (e) {
-    // 4. Emergency Fallback
-    return Directory.current;
-  }
-}
-```
-
 ---
 
 ## 📊 Analytics & Tracking
@@ -347,19 +196,6 @@ flutter drive --target=test_driver/perf_test.dart
 - **API Security**: Secure HTTPS connections
 - **User Privacy**: Kişisel veri toplama yok
 
-### Permission Management
-
-```dart
-// 📱 Smart Permission Handling
-static Future<bool> _requestStoragePermission() async {
-  if (Platform.isAndroid) {
-    final permission = await Permission.storage.request();
-    return permission == PermissionStatus.granted;
-  }
-  return true;
-}
-```
-
 ---
 
 ## 🌍 Localization Support
@@ -394,20 +230,6 @@ jobs:
       - run: flutter test
       - run: flutter analyze
       - run: flutter build apk --release
-```
-
-### Environment Configuration
-
-```dart
-// 🔧 Environment Variables
-class AppConfig {
-  static const String apiUrl = String.fromEnvironment(
-    'API_URL',
-    defaultValue: 'https://api.jamendo.com/v3.0',
-  );
-  
-  static const String clientId = String.fromEnvironment('CLIENT_ID');
-}
 ```
 
 ---
@@ -530,5 +352,3 @@ copies or substantial portions of the Software.
 **⭐ Projeyi beğendiyseniz yıldız vermeyi unutmayın! ⭐**
 
 Made with ❤️ by [Nazım Furkan Güneş](https://github.com/1furkangunes)
-
-</div> 
